@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -38,6 +39,7 @@ class Order extends Model
     {
         return [
             'paid_at' => 'datetime',
+            'status' => OrderStatus::class
         ];
     }
 
