@@ -7,4 +7,4 @@ WORKDIR /app
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install PHP Extension using FrankenPHP Helper
-RUN install-php-extensions pdo_pgsql pgsql zip 
+RUN install-php-extensions pdo_pgsql pgsql zip intl
