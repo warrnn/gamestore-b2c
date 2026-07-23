@@ -1,0 +1,54 @@
+services:
+  web:
+    build: . # Using local Dockerfile to build image
+    container_name: laravel_frankenphp
+    restart: unless-stopped # Automatically restart the container if it crashes, unless it is manually stopped
+    ports:
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+      - "443:443/udp"
+    volumes:
+      - .:/app
+      - vendor_data:/app/vendor
+      - node_modules_data:/app/node_modules
+    environment:
+      SERVER_NAME: ":80"
+      VARIABLES_ORDER: "EGPCS" # For laravel to read docker env
+      # FRANKENPHP_CONFIG: "worker ./public/frankenphp-worker.php" # Enable worker mode from FrankePHP
+    depends_on:
+      postgres:
+        condition: service_healthy # Wait until Postgres is fully ready to accept connections, not just until the container has started
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: laravel_postgres
+    restart: unless-stopped # Automatically restart the container if it crashes, unless it is manually stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Saving database data so it isn't lost when the container shuts down
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}" ] # Checking Postgres connection health with sending ping command
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
+
+# Create a virtual local network for communication between containers
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  # Create local volume specifically
+  postgres_data: # Postgres data
+  vendor_data: # Laravel vendor
+  node_modules_data: # Node modules
