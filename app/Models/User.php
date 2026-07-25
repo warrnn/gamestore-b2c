@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property string $id
@@ -35,10 +37,15 @@ use Illuminate\Support\Carbon;
 #[Fillable(['name', 'email', 'password', 'role_id'])]
 #[Hidden(['password', 'remember_token'])]
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, AuditableContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, Notifiable, HasUuids, Auditable;
+
+    protected array $auditExclude = [
+        'password',
+        'remember_token',
+    ];
 
     public function canAccessPanel(Panel $panel): bool
     {

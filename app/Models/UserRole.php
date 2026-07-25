@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property string $id
@@ -22,9 +24,9 @@ use Illuminate\Support\Carbon;
 
 #[Fillable(['name'])]
 
-class UserRole extends Model
+class UserRole extends Model implements AuditableContract
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, Auditable;
 
     public function users(): HasMany
     {
